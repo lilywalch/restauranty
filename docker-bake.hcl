@@ -3,11 +3,10 @@ group "default" {
 }
 
 target "common" {
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
   cache-from = ["type=registry,ref=lilywalch/restauranty-buildcache:cache"]
   cache-to = ["type=registry,ref=lilywalch/restauranty-buildcache:cache,mode=max"]
 }
-
 target "auth" {
   inherits = ["common"]
   context = "./backend/auth"
