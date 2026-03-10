@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const url = process.env.REACT_APP_SERVER_URL || process.env.REACT_APP_SERVER_DISCOUNTS_URL || "http://localhost:80"
+const url = process.env.REACT_APP_SERVER_URL || process.env.REACT_APP_SERVER_DISCOUNTS_URL || ""
 
 function CreateCampaign() {
     const [name, setName] = useState("");
@@ -43,7 +43,7 @@ function CreateCampaign() {
             .then((response) => {
                 if (response.status === 200) {
                     console.log(response.data);
-                    console.log("Coupon Inserted.");
+                    console.log("Campaign Inserted.");
                     navigate("/campaign");
                 }
             })

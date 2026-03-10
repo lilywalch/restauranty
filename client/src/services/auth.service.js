@@ -3,7 +3,7 @@ import axios from "axios";
 class AuthService {
   constructor() {
     this.api = axios.create({
-      baseURL: process.env.REACT_APP_SERVER_URL || process.env.REACT_APP_SERVER_AUTH_URL || "http://localhost:80",
+      baseURL: process.env.REACT_APP_SERVER_URL || process.env.REACT_APP_SERVER_AUTH_URL || "",
     });
 
     // Automatically set JWT token on the request headers for every request
@@ -12,7 +12,10 @@ class AuthService {
       const storedToken = localStorage.getItem("authToken");
 
       if (storedToken) {
-        config.headers = { Authorization: `Bearer ${storedToken}` };
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${storedToken}`,
+        };
       }
 
       return config;

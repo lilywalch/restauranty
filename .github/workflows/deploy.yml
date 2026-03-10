@@ -1,0 +1,52 @@
+name: Build and Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push images
+        run: docker buildx bake --push
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Verify cluster connection
+        run: kubectl get nodes
+
+      - name: Apply Kubernetes manifests
+        run: kubectl apply -f k8s/
+
+      - name: Restart deployments
+        run: |
+          kubectl rollout restart deployment/auth-deployment -n restauranty-lily
+          kubectl rollout restart deployment/items-deployment -n restauranty-lily
+          kubectl rollout restart deployment/discounts-deployment -n restauranty-lily
+          kubectl rollout restart deployment/client-deployment -n restauranty-lily
+
+      - name: Wait for rollouts
+        run: |
+          kubectl rollout status deployment/auth-deployment -n restauranty-lily
+          kubectl rollout status deployment/items-deployment -n restauranty-lily
+          kubectl rollout status deployment/discounts-deployment -n restauranty-lily
+          kubectl rollout status deployment/client-deployment -n restauranty-lily

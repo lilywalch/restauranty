@@ -1,0 +1,55 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: my-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  auth:
+    image: lilywalch/restauranty-auth-service:latest
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./backend/auth/.env
+    depends_on:
+      - mongo
+
+  discounts:
+    image: lilywalch/restauranty-discounts-service:latest
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./backend/discounts/.env
+    depends_on:
+      - mongo
+
+  items:
+    image: lilywalch/restauranty-items-service:latest
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./backend/items/.env
+    depends_on:
+      - mongo
+
+  client:
+    image: lilywalch/restauranty-client-service:latest
+    ports:
+      - "3000:3000"
+
+  haproxy:
+    image: haproxy:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - auth
+      - discounts
+      - items
+      - client
+
+volumes:
+  mongo-data:

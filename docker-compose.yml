@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  auth:
+    build: ./backend/auth
+    image: lilywalch/restauranty-auth-service:latest
+
+  discounts:
+    build: ./backend/discounts
+    image: lilywalch/restauranty-discounts-service:latest 
+
+  items:
+    build: ./backend/items
+    image: lilywalch/restauranty-items-service:latest
+
+  client:
+    build: ./client
+    image: lilywalch/restauranty-client-service:latest
