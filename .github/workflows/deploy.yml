@@ -22,8 +22,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Set image tag
+        run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Build and push images
-        run: docker buildx bake --push
+        run: docker buildx bake --push --set auth.tags=lilywalch/restauranty-auth-service:${IMAGE_TAG} --set discounts.tags=lilywalch/restauranty-discounts-service:${IMAGE_TAG} --set items.tags=lilywalch/restauranty-items-service:${IMAGE_TAG} --set client.tags=lilywalch/restauranty-client-service:${IMAGE_TAG}
 
       - name: Set up kubeconfig
         run: |
@@ -37,12 +40,12 @@ jobs:
       - name: Apply Kubernetes manifests
         run: kubectl apply -f k8s/
 
-      - name: Restart deployments
+      - name: Deploy tagged images
         run: |
-          kubectl rollout restart deployment/auth-deployment -n restauranty-lily
-          kubectl rollout restart deployment/items-deployment -n restauranty-lily
-          kubectl rollout restart deployment/discounts-deployment -n restauranty-lily
-          kubectl rollout restart deployment/client-deployment -n restauranty-lily
+          kubectl set image deployment/auth-deployment auth=lilywalch/restauranty-auth-service:${IMAGE_TAG} -n restauranty-lily
+          kubectl set image deployment/discounts-deployment discounts=lilywalch/restauranty-discounts-service:${IMAGE_TAG} -n restauranty-lily
+          kubectl set image deployment/items-deployment items=lilywalch/restauranty-items-service:${IMAGE_TAG} -n restauranty-lily
+          kubectl set image deployment/client-deployment client=lilywalch/restauranty-client-service:${IMAGE_TAG} -n restauranty-lily
 
       - name: Wait for rollouts
         run: |
