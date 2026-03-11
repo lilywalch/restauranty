@@ -19,7 +19,8 @@ spec:
         - name: discounts
           image: lilywalch/restauranty-discounts-service:latest
           ports:
-            - containerPort: 3003
+            - name: http
+              containerPort: 3003
           env:
             - name: SECRET
               valueFrom:

@@ -19,7 +19,8 @@ spec:
         - name: auth
           image: lilywalch/restauranty-auth-service:latest
           ports:
-            - containerPort: 3002
+            - name: http
+              containerPort: 3002
           env:
             - name: SECRET
               valueFrom:

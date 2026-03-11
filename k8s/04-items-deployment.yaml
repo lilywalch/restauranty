@@ -19,7 +19,8 @@ spec:
         - name: items
           image: lilywalch/restauranty-items-service:latest
           ports:
-            - containerPort: 3004
+            - name: http
+              containerPort: 3004
           env:
             - name: SECRET
               valueFrom:

@@ -56,8 +56,17 @@ const httpRequestsCounter = new client.Counter({
   labelNames: ['method', 'route', 'statusCode'],
 });
 
+// Histogram for HTTP request duration.
+const httpRequestDurationSeconds = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds',
+  labelNames: ['method', 'route', 'statusCode'],
+  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5],
+});
+
 // Express middleware to update both HTTP requests counters.
 function httpMetricsMiddleware(req, res, next) {
+  const end = httpRequestDurationSeconds.startTimer();
   res.on('finish', () => {
     const method = req.method;
     const route = req.originalUrl || req.url;
@@ -68,6 +77,14 @@ function httpMetricsMiddleware(req, res, next) {
 
     // Increment the overall counter.
     totalHttpRequestsCounter.inc();
+
+    // Observe request duration.
+    end({
+      method,
+      route,
+      statusCode,
+    });
+
   });
   next();
 }

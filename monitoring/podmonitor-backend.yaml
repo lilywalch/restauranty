@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: restauranty-backend
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - restauranty-lily
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - auth
+          - items
+          - discounts
+  podMetricsEndpoints:
+    - path: /metrics
+      port: http
+      interval: 15s
