@@ -6,5 +6,13 @@ mobile/.env
 server/.env
 backend/*/.env
 backend/*/node_modules
+terraform/.env
+.env
 mobile/.expo
 _restauranty-account
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+
